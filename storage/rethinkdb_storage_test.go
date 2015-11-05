@@ -23,6 +23,7 @@ func init() {
 	Rethink = session
 
 	dropTestDatabase()
+	createTestDatabase()
 }
 
 func initTestStorage() *RethinkStorage {
@@ -31,6 +32,10 @@ func initTestStorage() *RethinkStorage {
 
 func createTable(name string) {
 	r.DB(RethinkDBName).TableCreate(name).Exec(Rethink)
+}
+
+func dropTable(name string) {
+	r.DB(RethinkDBName).TableDrop(name).Exec(Rethink)
 }
 
 func createTestDatabase() {
@@ -58,9 +63,8 @@ func getConfig() r.ConnectOpts {
 }
 
 func TestClientCreate(t *testing.T) {
-	createTestDatabase()
 	createTable("oauth_clients")
-	defer dropTestDatabase()
+	defer dropTable("oauth_clients")
 
 	storage := initTestStorage()
 	client := &osin.DefaultClient{Id: "first_client", Secret: "secret1", RedirectUri: "http://localhost/first", UserData: make(map[string]interface{})}
@@ -68,9 +72,8 @@ func TestClientCreate(t *testing.T) {
 }
 
 func TestClientGet(t *testing.T) {
-	createTestDatabase()
 	createTable("oauth_clients")
-	defer dropTestDatabase()
+	defer dropTable("oauth_clients")
 
 	storage := initTestStorage()
 	client := &osin.DefaultClient{Id: "second_client", Secret: "secret2", RedirectUri: "http://localhost/second", UserData: make(map[string]interface{})}
@@ -82,9 +85,8 @@ func TestClientGet(t *testing.T) {
 }
 
 func TestClientUpdate(t *testing.T) {
-	createTestDatabase()
 	createTable("oauth_clients")
-	defer dropTestDatabase()
+	defer dropTable("oauth_clients")
 
 	storage := initTestStorage()
 	client := &osin.DefaultClient{Id: "third_client", Secret: "secret3", RedirectUri: "http://localhost/third", UserData: make(map[string]interface{})}
@@ -102,9 +104,8 @@ func TestClientUpdate(t *testing.T) {
 }
 
 func TestClientDelete(t *testing.T) {
-	createTestDatabase()
 	createTable("oauth_clients")
-	defer dropTestDatabase()
+	defer dropTable("oauth_clients")
 
 	storage := initTestStorage()
 	client := &osin.DefaultClient{Id: "first_client", Secret: "secret1", RedirectUri: "http://localhost/first", UserData: make(map[string]interface{})}
