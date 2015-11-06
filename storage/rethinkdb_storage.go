@@ -188,3 +188,21 @@ func (s *RethinkDBStorage) LoadAccess(token string) (*osin.AccessData, error) {
 
 	return &dataStruct, nil
 }
+
+// RemoveAccess deletes access data with given token
+func (s *RethinkDBStorage) RemoveAccess(token string) error {
+	result, err := r.Table(accessTable).Filter(r.Row.Field("AccessToken").Eq(token)).Run(s.session)
+	if err != nil {
+		return err
+	}
+	defer result.Close()
+
+	var dataMap map[string]interface{}
+	err = result.One(&dataMap)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.Table(accessTable).Get(dataMap["id"]).Delete().RunWrite(s.session)
+	return err
+}
