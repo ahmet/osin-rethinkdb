@@ -1,4 +1,4 @@
-package rethinkdb
+package RethinkDBStorage
 
 import (
 	"github.com/RangelReale/osin"
@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	clientsTable = "oauth_clients"
+	clientsTable        = "oauth_clients"
+	authorizationsTable = "oauth_authorizations"
 )
 
 // RethinkStorage implements storage for osin
@@ -22,7 +23,7 @@ func New(session *r.Session, dbName string) *RethinkStorage {
 	return storage
 }
 
-// CreateClient inserts a new client to storage
+// CreateClient inserts a new client
 func (s *RethinkStorage) CreateClient(c osin.Client) error {
 	_, err := r.Table(clientsTable).Insert(c).RunWrite(s.session)
 	return err
@@ -84,5 +85,60 @@ func (s *RethinkStorage) DeleteClient(c osin.Client) error {
 	}
 
 	_, err = r.Table(clientsTable).Get(clientMap["id"]).Delete().RunWrite(s.session)
+	return err
+}
+
+// SaveAuthorize creates a new authorization
+func (s *RethinkStorage) SaveAuthorize(data *osin.AuthorizeData) error {
+	_, err := r.Table(authorizationsTable).Insert(data).RunWrite(s.session)
+	return err
+}
+
+// LoadAuthorize gets authorization data with given code
+func (s *RethinkStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
+	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
+	if err != nil {
+		return nil, err
+	}
+	defer result.Close()
+
+	var dataMap map[string]interface{}
+	err = result.One(&dataMap)
+	if err != nil {
+		return nil, err
+	}
+
+	var client *osin.DefaultClient
+	clientID := dataMap["Client"].(map[string]interface{})["Id"].(string)
+	client, err = s.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+	dataMap["Client"] = client
+
+	var dataStruct osin.AuthorizeData
+	err = mapstructure.Decode(dataMap, &dataStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dataStruct, nil
+}
+
+// RemoveAuthorize deletes given authorization
+func (s *RethinkStorage) RemoveAuthorize(code string) error {
+	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
+	if err != nil {
+		return err
+	}
+	defer result.Close()
+
+	var dataMap map[string]interface{}
+	err = result.One(&dataMap)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.Table(authorizationsTable).Get(dataMap["id"]).Delete().RunWrite(s.session)
 	return err
 }

@@ -1,8 +1,10 @@
-package rethinkdb
+package RethinkDBStorage
 
 import (
 	"os"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/RangelReale/osin"
 	"github.com/stretchr/testify/require"
@@ -10,8 +12,10 @@ import (
 	r "gopkg.in/dancannon/gorethink.v1"
 )
 
-var Rethink *r.Session
-var RethinkDBName string
+var (
+	Rethink       *r.Session
+	RethinkDBName string
+)
 
 func init() {
 	RethinkDBName = getEnvOrDefault("RETHINKDB_DB", "osin_rethinkdb_storage")
@@ -62,21 +66,25 @@ func getConfig() r.ConnectOpts {
 		Database: RethinkDBName}
 }
 
-func TestClientCreate(t *testing.T) {
-	createTable("oauth_clients")
-	defer dropTable("oauth_clients")
+func newClient() *osin.DefaultClient {
+	return &osin.DefaultClient{Id: "client", Secret: "secret", RedirectUri: "http://localhost/", UserData: make(map[string]interface{})}
+}
+
+func TestCreateClient(t *testing.T) {
+	createTable(clientsTable)
+	defer dropTable(clientsTable)
 
 	storage := initTestStorage()
-	client := &osin.DefaultClient{Id: "first_client", Secret: "secret1", RedirectUri: "http://localhost/first", UserData: make(map[string]interface{})}
+	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 }
 
-func TestClientGet(t *testing.T) {
-	createTable("oauth_clients")
-	defer dropTable("oauth_clients")
+func TestGetClient(t *testing.T) {
+	createTable(clientsTable)
+	defer dropTable(clientsTable)
 
 	storage := initTestStorage()
-	client := &osin.DefaultClient{Id: "second_client", Secret: "secret2", RedirectUri: "http://localhost/second", UserData: make(map[string]interface{})}
+	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
 	clientFound, err := storage.GetClient(client.GetId())
@@ -84,16 +92,16 @@ func TestClientGet(t *testing.T) {
 	require.Equal(t, clientFound, client)
 }
 
-func TestClientUpdate(t *testing.T) {
-	createTable("oauth_clients")
-	defer dropTable("oauth_clients")
+func TestUpdateClient(t *testing.T) {
+	createTable(clientsTable)
+	defer dropTable(clientsTable)
 
 	storage := initTestStorage()
-	client := &osin.DefaultClient{Id: "third_client", Secret: "secret3", RedirectUri: "http://localhost/third", UserData: make(map[string]interface{})}
+	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
-	client.Secret = "secret3_changed"
-	client.RedirectUri = "http://localhost/third_changed"
+	client.Secret = "secret_changed"
+	client.RedirectUri = "http://localhost/changed"
 
 	err := storage.UpdateClient(client)
 	require.Nil(t, err)
@@ -103,14 +111,108 @@ func TestClientUpdate(t *testing.T) {
 	require.Equal(t, clientFound, client)
 }
 
-func TestClientDelete(t *testing.T) {
-	createTable("oauth_clients")
-	defer dropTable("oauth_clients")
+func TestDeleteClient(t *testing.T) {
+	createTable(clientsTable)
+	defer dropTable(clientsTable)
 
 	storage := initTestStorage()
-	client := &osin.DefaultClient{Id: "first_client", Secret: "secret1", RedirectUri: "http://localhost/first", UserData: make(map[string]interface{})}
+	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
 	err := storage.DeleteClient(client)
 	require.Nil(t, err)
+}
+
+func TestSaveAuthorize(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizationsTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizationsTable)
+
+	storage := initTestStorage()
+	client := newClient()
+	require.Nil(t, storage.CreateClient(client))
+
+	data := &osin.AuthorizeData{
+		Client:      client,
+		Code:        "9999",
+		ExpiresIn:   3600,
+		CreatedAt:   time.Now(),
+		RedirectUri: "http://localhost/",
+	}
+	require.Nil(t, storage.SaveAuthorize(data))
+}
+
+func TestLoadAuthorizeNonExistent(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizationsTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizationsTable)
+
+	storage := initTestStorage()
+	loadData, err := storage.LoadAuthorize("nonExistentCode")
+	require.Nil(t, loadData)
+	require.NotNil(t, err)
+}
+
+func TestLoadAuthorize(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizationsTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizationsTable)
+
+	storage := initTestStorage()
+	client := newClient()
+	require.Nil(t, storage.CreateClient(client))
+
+	data := &osin.AuthorizeData{
+		Client:      client,
+		Code:        "8888",
+		ExpiresIn:   3600,
+		CreatedAt:   time.Now(),
+		RedirectUri: "http://localhost/",
+	}
+	require.Nil(t, storage.SaveAuthorize(data))
+
+	loadData, err := storage.LoadAuthorize(data.Code)
+	require.Nil(t, err)
+	require.False(t, reflect.DeepEqual(loadData, data))
+}
+
+func TestRemoveAuthorizeNonExistent(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizationsTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizationsTable)
+
+	storage := initTestStorage()
+	err := storage.RemoveAuthorize("nonExistentCode")
+	require.NotNil(t, err)
+}
+
+func TestRemoveAuthorize(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizationsTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizationsTable)
+
+	storage := initTestStorage()
+	client := newClient()
+	require.Nil(t, storage.CreateClient(client))
+
+	data := &osin.AuthorizeData{
+		Client:      client,
+		Code:        "8888",
+		ExpiresIn:   3600,
+		CreatedAt:   time.Now(),
+		RedirectUri: "http://localhost/",
+	}
+	require.Nil(t, storage.SaveAuthorize(data))
+
+	err := storage.RemoveAuthorize("8888")
+	require.Nil(t, err)
+
+	loadData, err := storage.LoadAuthorize(data.Code)
+	require.Nil(t, loadData)
+	require.NotNil(t, err)
 }
