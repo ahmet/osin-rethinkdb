@@ -7,9 +7,11 @@ import (
 )
 
 const (
-	clientsTable   = "oauth_clients"
-	authorizeTable = "oauth_authorize_data"
-	accessTable    = "oauth_access_data"
+	clientsTable      = "oauth_clients"
+	authorizeTable    = "oauth_authorize_data"
+	accessTable       = "oauth_access_data"
+	accessTokenField  = "AccessToken"
+	refreshTokenField = "RefreshToken"
 )
 
 // RethinkDBStorage implements storage for osin
@@ -150,9 +152,29 @@ func (s *RethinkDBStorage) SaveAccess(data *osin.AccessData) error {
 	return err
 }
 
-// LoadAccess gets access data with given code
-func (s *RethinkDBStorage) LoadAccess(token string) (*osin.AccessData, error) {
-	result, err := r.Table(accessTable).Filter(r.Row.Field("AccessToken").Eq(token)).Run(s.session)
+// LoadAccess gets access data with given access token
+func (s *RethinkDBStorage) LoadAccess(accessToken string) (*osin.AccessData, error) {
+	return s.getAccessData(accessTokenField, accessToken)
+}
+
+// RemoveAccess deletes AccessData with given access token
+func (s *RethinkDBStorage) RemoveAccess(accessToken string) error {
+	return s.removeAccessData(accessTokenField, accessToken)
+}
+
+// LoadRefresh gets access data with given refresh token
+func (s *RethinkDBStorage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
+	return s.getAccessData(refreshTokenField, refreshToken)
+}
+
+// RemoveRefresh deletes AccessData with given refresh token
+func (s *RethinkDBStorage) RemoveRefresh(refreshToken string) error {
+	return s.removeAccessData(refreshTokenField, refreshToken)
+}
+
+// getAccessData is a common function to get AccessData by field
+func (s *RethinkDBStorage) getAccessData(fieldName, token string) (*osin.AccessData, error) {
+	result, err := r.Table(accessTable).Filter(r.Row.Field(fieldName).Eq(token)).Run(s.session)
 	if err != nil {
 		return nil, err
 	}
@@ -189,9 +211,9 @@ func (s *RethinkDBStorage) LoadAccess(token string) (*osin.AccessData, error) {
 	return &dataStruct, nil
 }
 
-// RemoveAccess deletes access data with given token
-func (s *RethinkDBStorage) RemoveAccess(token string) error {
-	result, err := r.Table(accessTable).Filter(r.Row.Field("AccessToken").Eq(token)).Run(s.session)
+// removeAccessData is a common function to remove AccessData by field
+func (s *RethinkDBStorage) removeAccessData(fieldName, token string) error {
+	result, err := r.Table(accessTable).Filter(r.Row.Field(fieldName).Eq(token)).Run(s.session)
 	if err != nil {
 		return err
 	}
