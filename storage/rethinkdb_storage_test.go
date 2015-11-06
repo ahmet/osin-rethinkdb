@@ -125,9 +125,9 @@ func TestDeleteClient(t *testing.T) {
 
 func TestSaveAuthorize(t *testing.T) {
 	createTable(clientsTable)
-	createTable(authorizationsTable)
+	createTable(authorizeTable)
 	defer dropTable(clientsTable)
-	defer dropTable(authorizationsTable)
+	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
 	client := newClient()
@@ -145,9 +145,9 @@ func TestSaveAuthorize(t *testing.T) {
 
 func TestLoadAuthorizeNonExistent(t *testing.T) {
 	createTable(clientsTable)
-	createTable(authorizationsTable)
+	createTable(authorizeTable)
 	defer dropTable(clientsTable)
-	defer dropTable(authorizationsTable)
+	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
 	loadData, err := storage.LoadAuthorize("nonExistentCode")
@@ -157,9 +157,9 @@ func TestLoadAuthorizeNonExistent(t *testing.T) {
 
 func TestLoadAuthorize(t *testing.T) {
 	createTable(clientsTable)
-	createTable(authorizationsTable)
+	createTable(authorizeTable)
 	defer dropTable(clientsTable)
-	defer dropTable(authorizationsTable)
+	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
 	client := newClient()
@@ -181,9 +181,9 @@ func TestLoadAuthorize(t *testing.T) {
 
 func TestRemoveAuthorizeNonExistent(t *testing.T) {
 	createTable(clientsTable)
-	createTable(authorizationsTable)
+	createTable(authorizeTable)
 	defer dropTable(clientsTable)
-	defer dropTable(authorizationsTable)
+	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
 	err := storage.RemoveAuthorize("nonExistentCode")
@@ -192,9 +192,9 @@ func TestRemoveAuthorizeNonExistent(t *testing.T) {
 
 func TestRemoveAuthorize(t *testing.T) {
 	createTable(clientsTable)
-	createTable(authorizationsTable)
+	createTable(authorizeTable)
 	defer dropTable(clientsTable)
-	defer dropTable(authorizationsTable)
+	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
 	client := newClient()
@@ -215,4 +215,37 @@ func TestRemoveAuthorize(t *testing.T) {
 	loadData, err := storage.LoadAuthorize(data.Code)
 	require.Nil(t, loadData)
 	require.NotNil(t, err)
+}
+
+func TestSaveAccess(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizeTable)
+	createTable(accessTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizeTable)
+	defer dropTable(accessTable)
+
+	storage := initTestStorage()
+	client := newClient()
+	require.Nil(t, storage.CreateClient(client))
+
+	authorizeData := &osin.AuthorizeData{
+		Client:      client,
+		Code:        "8888",
+		ExpiresIn:   3600,
+		CreatedAt:   time.Now(),
+		RedirectUri: "http://localhost/",
+	}
+	require.Nil(t, storage.SaveAuthorize(authorizeData))
+
+	accessData := &osin.AccessData{
+		Client:        authorizeData.Client,
+		AuthorizeData: authorizeData,
+		AccessToken:   "8888",
+		RefreshToken:  "r8888",
+		ExpiresIn:     3600,
+		CreatedAt:     time.Now(),
+	}
+
+	require.Nil(t, storage.SaveAccess(accessData))
 }

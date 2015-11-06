@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	clientsTable        = "oauth_clients"
-	authorizationsTable = "oauth_authorizations"
+	clientsTable   = "oauth_clients"
+	authorizeTable = "oauth_authorize_data"
+	accessTable    = "oauth_access_data"
 )
 
 // RethinkDBStorage implements storage for osin
@@ -90,13 +91,13 @@ func (s *RethinkDBStorage) DeleteClient(c osin.Client) error {
 
 // SaveAuthorize creates a new authorization
 func (s *RethinkDBStorage) SaveAuthorize(data *osin.AuthorizeData) error {
-	_, err := r.Table(authorizationsTable).Insert(data).RunWrite(s.session)
+	_, err := r.Table(authorizeTable).Insert(data).RunWrite(s.session)
 	return err
 }
 
 // LoadAuthorize gets authorization data with given code
 func (s *RethinkDBStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
+	result, err := r.Table(authorizeTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +128,7 @@ func (s *RethinkDBStorage) LoadAuthorize(code string) (*osin.AuthorizeData, erro
 
 // RemoveAuthorize deletes given authorization
 func (s *RethinkDBStorage) RemoveAuthorize(code string) error {
-	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
+	result, err := r.Table(authorizeTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
 	if err != nil {
 		return err
 	}
@@ -139,6 +140,12 @@ func (s *RethinkDBStorage) RemoveAuthorize(code string) error {
 		return err
 	}
 
-	_, err = r.Table(authorizationsTable).Get(dataMap["id"]).Delete().RunWrite(s.session)
+	_, err = r.Table(authorizeTable).Get(dataMap["id"]).Delete().RunWrite(s.session)
+	return err
+}
+
+// SaveAccess creates a new access data
+func (s *RethinkDBStorage) SaveAccess(data *osin.AccessData) error {
+	_, err := r.Table(accessTable).Insert(data).RunWrite(s.session)
 	return err
 }
