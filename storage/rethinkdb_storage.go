@@ -11,26 +11,26 @@ const (
 	authorizationsTable = "oauth_authorizations"
 )
 
-// RethinkStorage implements storage for osin
-type RethinkStorage struct {
+// RethinkDBStorage implements storage for osin
+type RethinkDBStorage struct {
 	dbName  string
 	session *r.Session
 }
 
-// New initializes and returns a new RethinkStorage
-func New(session *r.Session, dbName string) *RethinkStorage {
-	storage := &RethinkStorage{dbName, session}
+// New initializes and returns a new RethinkDBStorage
+func New(session *r.Session, dbName string) *RethinkDBStorage {
+	storage := &RethinkDBStorage{dbName, session}
 	return storage
 }
 
 // CreateClient inserts a new client
-func (s *RethinkStorage) CreateClient(c osin.Client) error {
+func (s *RethinkDBStorage) CreateClient(c osin.Client) error {
 	_, err := r.Table(clientsTable).Insert(c).RunWrite(s.session)
 	return err
 }
 
 // GetClient returns client with given ID
-func (s *RethinkStorage) GetClient(clientID string) (*osin.DefaultClient, error) {
+func (s *RethinkDBStorage) GetClient(clientID string) (*osin.DefaultClient, error) {
 	result, err := r.Table(clientsTable).Filter(r.Row.Field("Id").Eq(clientID)).Run(s.session)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *RethinkStorage) GetClient(clientID string) (*osin.DefaultClient, error)
 }
 
 // UpdateClient updates given client
-func (s *RethinkStorage) UpdateClient(c osin.Client) error {
+func (s *RethinkDBStorage) UpdateClient(c osin.Client) error {
 	result, err := r.Table(clientsTable).Filter(r.Row.Field("Id").Eq(c.GetId())).Run(s.session)
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func (s *RethinkStorage) UpdateClient(c osin.Client) error {
 }
 
 // DeleteClient deletes given client
-func (s *RethinkStorage) DeleteClient(c osin.Client) error {
+func (s *RethinkDBStorage) DeleteClient(c osin.Client) error {
 	result, err := r.Table(clientsTable).Filter(r.Row.Field("Id").Eq(c.GetId())).Run(s.session)
 	if err != nil {
 		return err
@@ -89,13 +89,13 @@ func (s *RethinkStorage) DeleteClient(c osin.Client) error {
 }
 
 // SaveAuthorize creates a new authorization
-func (s *RethinkStorage) SaveAuthorize(data *osin.AuthorizeData) error {
+func (s *RethinkDBStorage) SaveAuthorize(data *osin.AuthorizeData) error {
 	_, err := r.Table(authorizationsTable).Insert(data).RunWrite(s.session)
 	return err
 }
 
 // LoadAuthorize gets authorization data with given code
-func (s *RethinkStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
+func (s *RethinkDBStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (s *RethinkStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 }
 
 // RemoveAuthorize deletes given authorization
-func (s *RethinkStorage) RemoveAuthorize(code string) error {
+func (s *RethinkDBStorage) RemoveAuthorize(code string) error {
 	result, err := r.Table(authorizationsTable).Filter(r.Row.Field("Code").Eq(code)).Run(s.session)
 	if err != nil {
 		return err

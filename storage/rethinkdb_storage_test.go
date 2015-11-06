@@ -30,7 +30,7 @@ func init() {
 	createTestDatabase()
 }
 
-func initTestStorage() *RethinkStorage {
+func initTestStorage() *RethinkDBStorage {
 	return New(Rethink, RethinkDBName)
 }
 
