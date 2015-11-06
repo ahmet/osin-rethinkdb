@@ -149,3 +149,42 @@ func (s *RethinkDBStorage) SaveAccess(data *osin.AccessData) error {
 	_, err := r.Table(accessTable).Insert(data).RunWrite(s.session)
 	return err
 }
+
+// LoadAccess gets access data with given code
+func (s *RethinkDBStorage) LoadAccess(token string) (*osin.AccessData, error) {
+	result, err := r.Table(accessTable).Filter(r.Row.Field("AccessToken").Eq(token)).Run(s.session)
+	if err != nil {
+		return nil, err
+	}
+	defer result.Close()
+
+	var dataMap map[string]interface{}
+	err = result.One(&dataMap)
+	if err != nil {
+		return nil, err
+	}
+
+	var client *osin.DefaultClient
+	clientID := dataMap["Client"].(map[string]interface{})["Id"].(string)
+	client, err = s.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+	dataMap["Client"] = client
+
+	var authorizeDataClient *osin.DefaultClient
+	clientID = dataMap["AuthorizeData"].(map[string]interface{})["Client"].(map[string]interface{})["Id"].(string)
+	authorizeDataClient, err = s.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+	dataMap["AuthorizeData"].(map[string]interface{})["Client"] = authorizeDataClient
+
+	var dataStruct osin.AccessData
+	err = mapstructure.Decode(dataMap, &dataStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dataStruct, nil
+}

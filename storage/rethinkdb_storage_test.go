@@ -70,6 +70,27 @@ func newClient() *osin.DefaultClient {
 	return &osin.DefaultClient{Id: "client", Secret: "secret", RedirectUri: "http://localhost/", UserData: make(map[string]interface{})}
 }
 
+func newAuthorizeData(client *osin.DefaultClient) *osin.AuthorizeData {
+	return &osin.AuthorizeData{
+		Client:      client,
+		Code:        "8888",
+		ExpiresIn:   3600,
+		CreatedAt:   time.Now(),
+		RedirectUri: "http://localhost/",
+	}
+}
+
+func newAccessData(authorizeData *osin.AuthorizeData) *osin.AccessData {
+	return &osin.AccessData{
+		Client:        authorizeData.Client,
+		AuthorizeData: authorizeData,
+		AccessToken:   "8888",
+		RefreshToken:  "r8888",
+		ExpiresIn:     3600,
+		CreatedAt:     time.Now(),
+	}
+}
+
 func TestCreateClient(t *testing.T) {
 	createTable(clientsTable)
 	defer dropTable(clientsTable)
@@ -116,6 +137,7 @@ func TestDeleteClient(t *testing.T) {
 	defer dropTable(clientsTable)
 
 	storage := initTestStorage()
+
 	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
@@ -130,17 +152,12 @@ func TestSaveAuthorize(t *testing.T) {
 	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
+
 	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
-	data := &osin.AuthorizeData{
-		Client:      client,
-		Code:        "9999",
-		ExpiresIn:   3600,
-		CreatedAt:   time.Now(),
-		RedirectUri: "http://localhost/",
-	}
-	require.Nil(t, storage.SaveAuthorize(data))
+	authorizeData := newAuthorizeData(client)
+	require.Nil(t, storage.SaveAuthorize(authorizeData))
 }
 
 func TestLoadAuthorizeNonExistent(t *testing.T) {
@@ -162,21 +179,16 @@ func TestLoadAuthorize(t *testing.T) {
 	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
+
 	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
-	data := &osin.AuthorizeData{
-		Client:      client,
-		Code:        "8888",
-		ExpiresIn:   3600,
-		CreatedAt:   time.Now(),
-		RedirectUri: "http://localhost/",
-	}
-	require.Nil(t, storage.SaveAuthorize(data))
+	authorizeData := newAuthorizeData(client)
+	require.Nil(t, storage.SaveAuthorize(authorizeData))
 
-	loadData, err := storage.LoadAuthorize(data.Code)
+	loadData, err := storage.LoadAuthorize(authorizeData.Code)
 	require.Nil(t, err)
-	require.False(t, reflect.DeepEqual(loadData, data))
+	require.False(t, reflect.DeepEqual(loadData, authorizeData))
 }
 
 func TestRemoveAuthorizeNonExistent(t *testing.T) {
@@ -197,22 +209,17 @@ func TestRemoveAuthorize(t *testing.T) {
 	defer dropTable(authorizeTable)
 
 	storage := initTestStorage()
+
 	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
-	data := &osin.AuthorizeData{
-		Client:      client,
-		Code:        "8888",
-		ExpiresIn:   3600,
-		CreatedAt:   time.Now(),
-		RedirectUri: "http://localhost/",
-	}
-	require.Nil(t, storage.SaveAuthorize(data))
+	authorizeData := newAuthorizeData(client)
+	require.Nil(t, storage.SaveAuthorize(authorizeData))
 
-	err := storage.RemoveAuthorize("8888")
+	err := storage.RemoveAuthorize(authorizeData.Code)
 	require.Nil(t, err)
 
-	loadData, err := storage.LoadAuthorize(data.Code)
+	loadData, err := storage.LoadAuthorize(authorizeData.Code)
 	require.Nil(t, loadData)
 	require.NotNil(t, err)
 }
@@ -226,26 +233,48 @@ func TestSaveAccess(t *testing.T) {
 	defer dropTable(accessTable)
 
 	storage := initTestStorage()
+
 	client := newClient()
 	require.Nil(t, storage.CreateClient(client))
 
-	authorizeData := &osin.AuthorizeData{
-		Client:      client,
-		Code:        "8888",
-		ExpiresIn:   3600,
-		CreatedAt:   time.Now(),
-		RedirectUri: "http://localhost/",
-	}
+	authorizeData := newAuthorizeData(client)
 	require.Nil(t, storage.SaveAuthorize(authorizeData))
 
-	accessData := &osin.AccessData{
-		Client:        authorizeData.Client,
-		AuthorizeData: authorizeData,
-		AccessToken:   "8888",
-		RefreshToken:  "r8888",
-		ExpiresIn:     3600,
-		CreatedAt:     time.Now(),
-	}
-
+	accessData := newAccessData(authorizeData)
 	require.Nil(t, storage.SaveAccess(accessData))
+}
+
+func TestLoadAccessNonExistent(t *testing.T) {
+	createTable(accessTable)
+	defer dropTable(accessTable)
+
+	storage := initTestStorage()
+
+	loadData, err := storage.LoadAccess("nonExistentToken")
+	require.Nil(t, loadData)
+	require.NotNil(t, err)
+}
+
+func TestLoadAccess(t *testing.T) {
+	createTable(clientsTable)
+	createTable(authorizeTable)
+	createTable(accessTable)
+	defer dropTable(clientsTable)
+	defer dropTable(authorizeTable)
+	defer dropTable(accessTable)
+
+	storage := initTestStorage()
+
+	client := newClient()
+	require.Nil(t, storage.CreateClient(client))
+
+	authorizeData := newAuthorizeData(client)
+	require.Nil(t, storage.SaveAuthorize(authorizeData))
+
+	accessData := newAccessData(authorizeData)
+	require.Nil(t, storage.SaveAccess(accessData))
+
+	loadData, err := storage.LoadAccess(accessData.AccessToken)
+	require.Nil(t, err)
+	require.False(t, reflect.DeepEqual(loadData, accessData))
 }
