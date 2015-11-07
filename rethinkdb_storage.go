@@ -1,9 +1,9 @@
 package RethinkDBStorage
 
 import (
-	"github.com/RangelReale/osin"
-	"github.com/mitchellh/mapstructure"
-	r "gopkg.in/dancannon/gorethink.v1"
+	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/mitchellh/mapstructure"
+	r "github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/gopkg.in/dancannon/gorethink.v1"
 )
 
 const (

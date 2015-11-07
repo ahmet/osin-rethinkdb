@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/RangelReale/osin"
-	"github.com/stretchr/testify/require"
+	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/stretchr/testify/require"
 
-	r "gopkg.in/dancannon/gorethink.v1"
+	r "github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/gopkg.in/dancannon/gorethink.v1"
 )
 
 var (
