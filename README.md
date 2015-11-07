@@ -1,5 +1,6 @@
 osin-rethinkdb
 ==============
+[![Build Status](https://travis-ci.org/ahmet/osin-rethinkdb.svg?branch=master)](https://travis-ci.org/ahmet/osin-rethinkdb)
 
 This package implements the storage for [OSIN](https://github.com/RangelReale/osin) with [RethinkDB](http://rethinkdb.com) using [gorethink](https://github.com/dancannon/gorethink).
 
