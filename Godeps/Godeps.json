@@ -1,0 +1,61 @@
+{
+	"ImportPath": "github.com/ahmet/osin-rethinkdb",
+	"GoVersion": "go1.5.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/RangelReale/osin",
+			"Rev": "490411d9dd8e310e1ff66e8a7e39de820b5b9368"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-30-g4643a7e",
+			"Rev": "4643a7efec9b8fd7548882e7b30095711343100f"
+		},
+		{
+			"ImportPath": "github.com/cenkalti/backoff",
+			"Rev": "4dc77674aceaabba2c7e3da25d4c823edfb73f99"
+		},
+		{
+			"ImportPath": "github.com/dancannon/gorethink/encoding",
+			"Comment": "v1.1.4",
+			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+		},
+		{
+			"ImportPath": "github.com/dancannon/gorethink/ql2",
+			"Comment": "v1.1.4",
+			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+		},
+		{
+			"ImportPath": "github.com/dancannon/gorethink/types",
+			"Comment": "v1.1.4",
+			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "5baca1b63153b1a82014546382edbdd302b138b6"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "281073eb9eb092240d33ef253c404f1cca550309"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
+		},
+		{
+			"ImportPath": "gopkg.in/dancannon/gorethink.v1",
+			"Comment": "v1.1.4",
+			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+		}
+	]
+}
