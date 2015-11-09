@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/RangelReale/osin"
+	"github.com/stretchr/testify/require"
 
-	r "github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/gopkg.in/dancannon/gorethink.v1"
+	r "gopkg.in/dancannon/gorethink.v1"
 )
 
 var (
@@ -31,7 +31,7 @@ func init() {
 }
 
 func initTestStorage() *RethinkDBStorage {
-	return New(Rethink, RethinkDBName)
+	return New(Rethink)
 }
 
 func createTable(name string) {

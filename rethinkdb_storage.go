@@ -1,9 +1,9 @@
 package RethinkDBStorage
 
 import (
-	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/github.com/mitchellh/mapstructure"
-	r "github.com/ahmet/osin-rethinkdb/Godeps/_workspace/src/gopkg.in/dancannon/gorethink.v1"
+	"github.com/RangelReale/osin"
+	"github.com/mitchellh/mapstructure"
+	r "gopkg.in/dancannon/gorethink.v1"
 )
 
 const (
@@ -25,6 +25,14 @@ func New(session *r.Session) *RethinkDBStorage {
 	return storage
 }
 
+// Clone the storage if needed.
+func (s *RethinkDBStorage) Clone() osin.Storage {
+	return s
+}
+
+// Close the resources the Storage potentially holds
+func (s *RethinkDBStorage) Close() {}
+
 // CreateClient inserts a new client
 func (s *RethinkDBStorage) CreateClient(c osin.Client) error {
 	_, err := r.Table(clientsTable).Insert(c).RunWrite(s.session)
@@ -32,7 +40,7 @@ func (s *RethinkDBStorage) CreateClient(c osin.Client) error {
 }
 
 // GetClient returns client with given ID
-func (s *RethinkDBStorage) GetClient(clientID string) (*osin.DefaultClient, error) {
+func (s *RethinkDBStorage) GetClient(clientID string) (osin.Client, error) {
 	result, err := r.Table(clientsTable).Filter(r.Row.Field("Id").Eq(clientID)).Run(s.session)
 	if err != nil {
 		return nil, err
@@ -110,7 +118,7 @@ func (s *RethinkDBStorage) LoadAuthorize(code string) (*osin.AuthorizeData, erro
 		return nil, err
 	}
 
-	var client *osin.DefaultClient
+	var client osin.Client
 	clientID := dataMap["Client"].(map[string]interface{})["Id"].(string)
 	client, err = s.GetClient(clientID)
 	if err != nil {
@@ -185,7 +193,7 @@ func (s *RethinkDBStorage) getAccessData(fieldName, token string) (*osin.AccessD
 		return nil, err
 	}
 
-	var client *osin.DefaultClient
+	var client osin.Client
 	clientID := dataMap["Client"].(map[string]interface{})["Id"].(string)
 	client, err = s.GetClient(clientID)
 	if err != nil {
@@ -193,7 +201,7 @@ func (s *RethinkDBStorage) getAccessData(fieldName, token string) (*osin.AccessD
 	}
 	dataMap["Client"] = client
 
-	var authorizeDataClient *osin.DefaultClient
+	var authorizeDataClient osin.Client
 	clientID = dataMap["AuthorizeData"].(map[string]interface{})["Client"].(map[string]interface{})["Id"].(string)
 	authorizeDataClient, err = s.GetClient(clientID)
 	if err != nil {
