@@ -16,13 +16,12 @@ const (
 
 // RethinkDBStorage implements storage for osin
 type RethinkDBStorage struct {
-	dbName  string
 	session *r.Session
 }
 
 // New initializes and returns a new RethinkDBStorage
-func New(session *r.Session, dbName string) *RethinkDBStorage {
-	storage := &RethinkDBStorage{dbName, session}
+func New(session *r.Session) *RethinkDBStorage {
+	storage := &RethinkDBStorage{session}
 	return storage
 }
 
