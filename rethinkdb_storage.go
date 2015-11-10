@@ -201,13 +201,18 @@ func (s *RethinkDBStorage) getAccessData(fieldName, token string) (*osin.AccessD
 	}
 	dataMap["Client"] = client
 
-	var authorizeDataClient osin.Client
-	clientID = dataMap["AuthorizeData"].(map[string]interface{})["Client"].(map[string]interface{})["Id"].(string)
-	authorizeDataClient, err = s.GetClient(clientID)
-	if err != nil {
-		return nil, err
+	if authorizeData := dataMap["AuthorizeData"]; authorizeData != nil {
+		if authorizeDataClient := authorizeData.(map[string]interface{})["Client"]; authorizeDataClient != nil {
+			var authorizeDataClientStruct osin.Client
+			if authorizeDataClientID := authorizeDataClient.(map[string]interface{})["Id"]; authorizeDataClientID != nil {
+				authorizeDataClientStruct, err = s.GetClient(authorizeDataClientID.(string))
+				if err != nil {
+					return nil, err
+				}
+				dataMap["AuthorizeData"].(map[string]interface{})["Client"] = authorizeDataClientStruct
+			}
+		}
 	}
-	dataMap["AuthorizeData"].(map[string]interface{})["Client"] = authorizeDataClient
 
 	var dataStruct osin.AccessData
 	err = mapstructure.Decode(dataMap, &dataStruct)
