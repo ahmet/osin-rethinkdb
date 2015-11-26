@@ -31,6 +31,10 @@
 			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
 		},
 		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
+		},
+		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "5baca1b63153b1a82014546382edbdd302b138b6"
 		},
@@ -41,6 +45,10 @@
 		{
 			"ImportPath": "github.com/pborman/uuid",
 			"Rev": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655"
+		},
+		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Rev": "d8ed2627bdf02c080bf22230dbb337003b7aba2d"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
