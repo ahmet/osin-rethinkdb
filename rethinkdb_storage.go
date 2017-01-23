@@ -3,7 +3,7 @@ package RethinkDBStorage
 import (
 	"github.com/RangelReale/osin"
 	"github.com/mitchellh/mapstructure"
-	r "gopkg.in/dancannon/gorethink.v1"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 const (
