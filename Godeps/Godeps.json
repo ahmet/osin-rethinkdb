@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/ahmet/osin-rethinkdb",
-	"GoVersion": "go1.5.1",
+  "GoVersion": "go1.5.1",
 	"Deps": [
 		{
 			"ImportPath": "github.com/RangelReale/osin",
@@ -12,31 +12,17 @@
 			"Rev": "4643a7efec9b8fd7548882e7b30095711343100f"
 		},
 		{
-			"ImportPath": "github.com/cenkalti/backoff",
-			"Rev": "4dc77674aceaabba2c7e3da25d4c823edfb73f99"
-		},
-		{
-			"ImportPath": "github.com/dancannon/gorethink/encoding",
-			"Comment": "v1.1.4",
-			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
-		},
-		{
-			"ImportPath": "github.com/dancannon/gorethink/ql2",
-			"Comment": "v1.1.4",
-			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
-		},
-		{
-			"ImportPath": "github.com/dancannon/gorethink/types",
-			"Comment": "v1.1.4",
-			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
-		},
-		{
-			"ImportPath": "github.com/davecgh/go-spew/spew",
-			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
+			"ImportPath": "github.com/cenk/backoff",
+			"Comment": "v1.0.0-15-gb02f2bb",
+			"Rev": "b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "5baca1b63153b1a82014546382edbdd302b138b6"
+		},
+		{
+			"ImportPath": "github.com/hailocab/go-hostpool",
+			"Rev": "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
 		},
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
@@ -45,10 +31,6 @@
 		{
 			"ImportPath": "github.com/pborman/uuid",
 			"Rev": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655"
-		},
-		{
-			"ImportPath": "github.com/pmezard/go-difflib/difflib",
-			"Rev": "d8ed2627bdf02c080bf22230dbb337003b7aba2d"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
@@ -61,9 +43,32 @@
 			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
 		},
 		{
-			"ImportPath": "gopkg.in/dancannon/gorethink.v1",
-			"Comment": "v1.1.4",
-			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+			"ImportPath": "golang.org/x/crypto/pbkdf2",
+			"Rev": "b8a2a83acfe6e6770b75de42d5ff4c67596675c0"
+		},
+		{
+			"ImportPath": "gopkg.in/fatih/pool.v2",
+			"Rev": "6e328e67893eb46323ad06f0e92cb9536babbabc"
+		},
+		{
+			"ImportPath": "gopkg.in/gorethink/gorethink.v2/encoding",
+			"Comment": "v2.2.2",
+			"Rev": "016a1d3b4d15951ab2e39bd3596718ba94d298ba"
+		},
+		{
+			"ImportPath": "gopkg.in/gorethink/gorethink.v2/ql2",
+			"Comment": "v2.2.2",
+			"Rev": "016a1d3b4d15951ab2e39bd3596718ba94d298ba"
+		},
+		{
+			"ImportPath": "gopkg.in/gorethink/gorethink.v2/types",
+			"Comment": "v2.2.2",
+			"Rev": "016a1d3b4d15951ab2e39bd3596718ba94d298ba"
+		},
+		{
+			"ImportPath": "gopkg.in/gorethink/gorethink.v3",
+			"Comment": "v3.0.0",
+			"Rev": "417badecf1ab14d0d6e38ad82397da2a59e2f6ca"
 		}
 	]
 }

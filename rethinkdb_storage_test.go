@@ -9,7 +9,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/stretchr/testify/require"
 
-	r "gopkg.in/dancannon/gorethink.v1"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 var (
